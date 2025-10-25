@@ -1,0 +1,196 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\KDTree">
+      <UniqueIdentifier>{636a1855-3474-48fb-b000-a9a8246d2aef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\KDTree">
+      <UniqueIdentifier>{4cfa97b9-35d1-47d2-833c-901b8a204b13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Base">
+      <UniqueIdentifier>{01002550-03a5-473e-80d8-5f3a1015cc0c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Base">
+      <UniqueIdentifier>{752b2f0e-1656-4138-9444-df0985607096}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\WinAPIHeaders">
+      <UniqueIdentifier>{1707b71f-ea61-4956-acaf-470c9a06c1c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\InputDevices">
+      <UniqueIdentifier>{328abfbd-b2af-49a0-afea-b939125bb209}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\InputDevices">
+      <UniqueIdentifier>{0eea53f6-0af1-4560-8dd9-2a63c5bc4608}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{26cf6b76-5730-4620-aa2f-2894cd127fa2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Scenario.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SkyDome.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Terreno.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="KDTree\KDTree.h">
+      <Filter>Header Files\KDTree</Filter>
+    </ClInclude>
+    <ClInclude Include="KDTree\CollitionDetection.h">
+      <Filter>Header Files\KDTree</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\Utilities.h">
+      <Filter>Header Files\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\material.h">
+      <Filter>Header Files\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\shader.h">
+      <Filter>Header Files\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\camera.h">
+      <Filter>Header Files\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="WinAPIHeaders\DemoTemplateOGL.h">
+      <Filter>Header Files\WinAPIHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="WinAPIHeaders\framework.h">
+      <Filter>Header Files\WinAPIHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\glext.h">
+      <Filter>Header Files\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="WinAPIHeaders\Resource.h">
+      <Filter>Header Files\WinAPIHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="InputDevices\GamePadRR.h">
+      <Filter>Header Files\InputDevices</Filter>
+    </ClInclude>
+    <ClInclude Include="InputDevices\KeyboardInput.h">
+      <Filter>Header Files\InputDevices</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\mesh.h">
+      <Filter>Header Files\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="WinAPIHeaders\targetver.h">
+      <Filter>Header Files\WinAPIHeaders</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\wglext.h">
+      <Filter>Header Files\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\Scene.h">
+      <Filter>Header Files\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\Model.h">
+      <Filter>Header Files\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Water.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\Animation.h">
+      <Filter>Header Files\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\Animator.h">
+      <Filter>Header Files\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\Bone.h">
+      <Filter>Header Files\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\Billboard.h">
+      <Filter>Header Files\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\font_atlas.h">
+      <Filter>Header Files\Base</Filter>
+    </ClInclude>
+    <ClInclude Include="Texto.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Billboard2D.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CollitionBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Base\BillboardAnimation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Billboard2DAnimation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="DemoTemplateOGL.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="KDTree\KDTree.cpp">
+      <Filter>Source Files\KDTree</Filter>
+    </ClCompile>
+    <ClCompile Include="KDTree\CollitionDetection.cpp">
+      <Filter>Source Files\KDTree</Filter>
+    </ClCompile>
+    <ClCompile Include="Base\Utilities.cpp">
+      <Filter>Source Files\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Base\glad.c">
+      <Filter>Source Files\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="InputDevices\KeyboardInput.cpp">
+      <Filter>Source Files\InputDevices</Filter>
+    </ClCompile>
+    <ClCompile Include="Base\Model.cpp">
+      <Filter>Source Files\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Base\Animation.cpp">
+      <Filter>Source Files\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Base\Animator.cpp">
+      <Filter>Source Files\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Base\Bone.cpp">
+      <Filter>Source Files\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Base\Billboard.cpp">
+      <Filter>Source Files\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Base\font_atlas.cpp">
+      <Filter>Source Files\Base</Filter>
+    </ClCompile>
+    <ClCompile Include="Texto.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Scenario.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CollitionBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DemoTemplateOGL.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="small.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="DemoTemplateOGL.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

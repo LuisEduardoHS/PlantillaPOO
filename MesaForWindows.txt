@@ -1,0 +1,3 @@
+https://github.com/pal1000/mesa-dist-win/releases
+https://github.com/pal1000/mesa-dist-win/releases/download/24.2.7/mesa3d-24.2.7-release-msvc.7z
+https://github.com/pal1000/mesa-dist-win/releases/download/24.2.7/mesa3d-24.2.7-release-mingw.7z
