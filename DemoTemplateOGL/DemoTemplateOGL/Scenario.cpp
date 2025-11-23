@@ -206,6 +206,7 @@ void Scenario::InitGraph(Model *main) {
 	model->setTranslate(&translate);
 	model->setNextTranslate(&translate);
 	model->setScale(&scale);
+    model->ignoreAABB = true;
 	ourModel.emplace_back(model);
 
     model = new Model("models/Ambiente/pine_tree_single_01.glb", main->cameraDetails);
@@ -215,18 +216,79 @@ void Scenario::InitGraph(Model *main) {
     model->setTranslate(&translate);
     model->setNextTranslate(&translate);
     model->setScale(&scale);
+    model->ignoreAABB = true;
+    ModelAttributes& attrArbol3 = model->getModelAttributes()->at(0);
+    if (attrArbol3.hitbox != NULL) {
+        delete (Model*)attrArbol3.hitbox; // Liberamos la memoria de la caja
+        attrArbol3.hitbox = NULL;         // La ponemos en NULL para que el jugador la ignore
+    }
     //model->setNextRotX(270);
     ourModel.emplace_back(model);
 
-    model = new Model("models/Estructuras/FABRICAGLB.glb", main->cameraDetails);
-    translate = glm::vec3(50.0f, terreno->Superficie(200.0f, 30.0f), 600.0f);
-    scale = glm::vec3(8.0f, 8.0f, 8.0f);	// it's a bit too big for our scene, so scale it down
-    model->name = "Arbol3";
-    model->setTranslate(&translate);
-    model->setNextTranslate(&translate);
-    model->setScale(&scale);
-    //model->setNextRotX(270);
-    ourModel.emplace_back(model);
+    // ------------------ FABRICA -----------------------
+
+    glm::vec3 posEdificio = glm::vec3(50.0f, terreno->Superficie(50.0f, 600.0f), 600.0f);
+
+    Model* fabrica = new Model("models/Estructuras/Warehouse_Final.glb", main->cameraDetails);
+    fabrica->name = "FabricaVisual";
+    glm::vec3 scaleFabrica = glm::vec3(6.0f, 6.0f, 6.0f);
+
+    fabrica->setTranslate(&posEdificio);
+    fabrica->setNextTranslate(&posEdificio);
+    fabrica->setScale(&scaleFabrica);
+
+    fabrica->setRotX(0.0f);
+    fabrica->setNextRotX(0.0f);
+
+    fabrica->ignoreAABB = true;
+
+    ModelAttributes& attrFabrica = fabrica->getModelAttributes()->at(0);
+    if (attrFabrica.hitbox != NULL) {
+        delete (Model*)attrFabrica.hitbox; // Liberamos la memoria de la caja
+        attrFabrica.hitbox = NULL;         // La ponemos en NULL para que el jugador la ignore
+    }
+
+    ourModel.emplace_back(fabrica);
+
+    // 2. PARED IZQUIERDA (Mirando desde la entrada)
+    CollitionBox* paredIzq = new CollitionBox(
+        posEdificio.x - 65.0f, posEdificio.y + 20.0f, posEdificio.z, // Movida a la izquierda
+        2.0f, 50.0f, 120.0f, // Delgada en X, Alta en Y, Larga en Z
+        main->cameraDetails
+    );
+    ourModel.emplace_back(paredIzq);
+
+    // 3. PARED DERECHA
+    CollitionBox* paredDer = new CollitionBox(
+        posEdificio.x + 65.0f, posEdificio.y + 20.0f, posEdificio.z, // Movida a la derecha
+        2.0f, 50.0f, 120.0f,
+        main->cameraDetails
+    );
+    ourModel.emplace_back(paredDer);
+
+    // 4. PARED TRASERA(AHORA ES SOLIDA EN EL LADO "POSITIVO")
+        CollitionBox * paredFondo = new CollitionBox(
+            posEdificio.x, posEdificio.y + 20.0f, posEdificio.z + 100.0f, // CAMBIO: +100 en vez de -100
+            70.0f, 50.0f, 2.0f,
+            main->cameraDetails
+        );
+    ourModel.emplace_back(paredFondo);
+
+    // 5. PARED FRENTE IZQUIERDA (AHORA CON HUECO EN EL LADO "NEGATIVO")
+    CollitionBox* paredFrente1 = new CollitionBox(
+        posEdificio.x - 40.0f, posEdificio.y + 20.0f, posEdificio.z - 100.0f, // CAMBIO: -100 en vez de +100
+        30.0f, 50.0f, 2.0f,
+        main->cameraDetails
+    );
+    ourModel.emplace_back(paredFrente1);
+
+    // 6. PARED FRENTE DERECHA
+    CollitionBox* paredFrente2 = new CollitionBox(
+        posEdificio.x + 40.0f, posEdificio.y + 20.0f, posEdificio.z - 100.0f, // CAMBIO: -100 en vez de +100
+        30.0f, 50.0f, 2.0f,
+        main->cameraDetails
+    );
+    ourModel.emplace_back(paredFrente2);
 
     // ------------------ VEHICULOS -----------------------
 
@@ -345,7 +407,7 @@ void Scenario::InitGraph(Model *main) {
 
     // Generar bosque aleatorio (árboles modelos reducidos y cerca del pasillo)
     srand(time(NULL));  // Semilla para aleatoriedad
-    const int numArboles = 20;  // Reducido para menos lag
+    const int numArboles = 20;
     const float minDistancia = 15.0f;  // Distancia mínima entre árboles
     std::vector<glm::vec3> posicionesArboles;  // Lista de posiciones para evitar empalmes
 
@@ -413,6 +475,13 @@ void Scenario::InitGraph(Model *main) {
         if (rotX != 0.0f) model->setNextRotX(rotX);
         model->setNextRotY(rotY);
         model->name = "ArbolBosque" + std::to_string(i);
+
+        model->ignoreAABB = true;
+        ModelAttributes& attrArbol = model->getModelAttributes()->at(0);
+        if (attrArbol.hitbox != NULL) {
+            delete (Model*)attrArbol.hitbox; // Liberamos la memoria de la caja
+            attrArbol.hitbox = NULL;         // La ponemos en NULL para que el jugador la ignore
+        }
 
         ourModel.emplace_back(model);
     }
