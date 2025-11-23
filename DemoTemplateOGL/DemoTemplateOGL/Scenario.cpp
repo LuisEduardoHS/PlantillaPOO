@@ -103,6 +103,82 @@ void Scenario::InitGraph(Model *main) {
 	*model->getBonesInfo() = *silly->getBonesInfo();
 	model->setAnimator(silly->getAnimator());
 
+    Model* villano = new Model("models/Villano/Villano_Base.fbx", main->cameraDetails);
+
+    translate = glm::vec3(20.0f, terreno->Superficie(20.0f, 30.0f), 30.0f);
+    scale = glm::vec3(0.02f, 0.02f, 0.02f); // Ajusta la escala, los FBX de Mixamo a veces son enormes o diminutos
+    villano->name = "Villano";
+    villano->setTranslate(&translate);
+    villano->setNextTranslate(&translate);
+    villano->setScale(&scale);
+
+    unsigned int texVillanoID = TextureFromFile("BaseColor.png", "models/Villano");
+
+    if (texVillanoID != -1) { // Verificamos que cargo
+        Texture tVillano;
+        tVillano.id = texVillanoID;
+        strcpy_s(tVillano.type, "texture_diffuse");
+        strcpy_s(tVillano.path, "models/Villano/BaseColor.png");
+
+        // Recorremos los meshes y forzamos la textura
+        for (Mesh* mesh : villano->meshes) {
+            mesh->textures.clear();
+            mesh->textures.push_back(tVillano);
+        }
+    }
+    else {
+        ERRORL("No se encontro BaseColor.png en models/Villano", "TEXTURE_ERROR");
+    }
+
+    try {
+        // Asegurate que Villano_Idle.fbx este en la carpeta
+        std::vector<Animation> animIdle = Animation::loadAllAnimations("models/Villano/Villano_Walk.fbx", villano->GetBoneInfoMap(), villano->getBonesInfo(), villano->GetBoneCount());
+
+        // Se la pasamos al modelo principal
+        for (Animation anim : animIdle) {
+            villano->setAnimator(Animator(anim));
+        }
+
+        // Reproducir
+        if (!animIdle.empty()) {
+            villano->setAnimation(0);
+        }
+    }
+    catch (...) {
+        ERRORL("Error cargando animacion Idle del Villano", "ANIM_ERROR");
+    }
+
+    // 1. Accedemos a los atributos del villano
+    ModelAttributes& attrVillano = villano->getModelAttributes()->at(0);
+
+    // 2. Borramos la hitbox automatica que salio mal
+    if (attrVillano.hitbox != NULL) {
+        delete (Model*)attrVillano.hitbox;
+    }
+
+    // 3. Definimos las dimensiones manuales (En unidades de Mixamo, antes de escalar)
+    // Un humano promedio mide ~180 unidades de alto en Mixamo
+    float alto = 180.0f;
+    float ancho = 60.0f;
+    float prof = 60.0f;
+
+    // 4. Creamos un "Nodo" falso con el centro ajustado hacia arriba
+    // (centerY = alto/2) hace que la caja empiece en los pies y suba
+    Node nodoCaja;
+    nodoCaja.m_center = glm::vec4(0.0f, alto / 2.0f, 0.0f, 1.0f);
+    nodoCaja.m_halfWidth = ancho / 2.0f;
+    nodoCaja.m_halfHeight = alto / 2.0f;
+    nodoCaja.m_halfDepth = prof / 2.0f;
+
+    // 5. Generamos la nueva caja y la asignamos
+    attrVillano.hitbox = CollitionBox::GenerateAABB(*villano->getTranslate(), nodoCaja, main->cameraDetails);
+
+    // 6. IMPORTANTE: Aplicamos la misma escala del modelo a la caja (0.02)
+    ((Model*)attrVillano.hitbox)->setScale(villano->getScale());
+
+    // Agregar a la escena
+    ourModel.emplace_back(villano);
+
     /*
     model = new Model("models/Villano/Zombie.fbx", main->cameraDetails);
     translate = glm::vec3(100.0f, terreno->Superficie(100.0f, 60.0f), 0.0f);
@@ -360,16 +436,6 @@ void Scenario::InitGraph(Model *main) {
     model->setScale(&scale);
     model->setNextRotX(270);
     ourModel.emplace_back(model);
-
-
-	model = new Model("models/Villano/zombie_mutant.glb", main->cameraDetails);
-	translate = glm::vec3(20.0f, terreno->Superficie(20.0f, 30.0f), 30.0f);
-	scale = glm::vec3(0.02f, 0.02f, 0.02f);	// it's a bit too big for our scene, so scale it down
-	model->name = "Arbol1";
-	model->setTranslate(&translate);
-	model->setNextTranslate(&translate);
-	model->setScale(&scale);
-	ourModel.emplace_back(model);
 	
 
 	inicializaBillboards();
@@ -464,9 +530,26 @@ Scene* Scenario::Render() {
 	for (int i = 0; i < billBoard2D.size(); i++)
 		billBoard2D[i]->Draw();
 	// Dibujamos cada modelo que este cargado en nuestro arreglo de modelos
-	for (int i = 0; i < ourModel.size(); i++) {
-			ourModel[i]->Draw();
-	}
+    // Con ocultamiento del jugador en 1ra persona)
+    for (int i = 0; i < ourModel.size(); i++) {
+        Model* modeloActual = ourModel[i];
+
+        // Verificamos si este modelo es el personaje principal ("camara")
+        if (modeloActual == camara) {
+            // Calculamos distancia entre la camara y los pies del personaje
+            float distancia = glm::distance(camara->cameraDetails->getPosition(), *camara->getTranslate());
+
+            // Si la distancia es menor a 5.0, asumimos que es Primera Persona (o la cámara atravesando la cabeza).
+            // Solo dibujamos si la cámara está LEJOS (Tercera persona).
+            if (distancia > 5.0f) {
+                modeloActual->Draw();
+            }
+        }
+        else {
+            // Si NO es el jugador (es un arbol, villano, caja), dibujar siempre
+            modeloActual->Draw();
+        }
+    }
 	for (int i = 0; i < ourText.size(); i++) {
 		ourText[i]->Draw();
 	}
