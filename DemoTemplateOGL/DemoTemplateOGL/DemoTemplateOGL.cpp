@@ -16,6 +16,7 @@
 #include "Base/Scene.h"
 #include "Scenario.h"
 #include "Recolectable.h"
+#include "Principal.h"
 
 #define MAX_LOADSTRING 100
 #ifdef _WIN32 
@@ -117,7 +118,7 @@ int startGameEngine(void *ptrMsg){
     //MainModel *model = new MainModel(hWnd, "models/Cube.obj", translate);
     //MainModel *model = new MainModel(hWnd, "models/Cube.obj", translate);
     Camera* camera = Camera::getInstance();
-    Model* model = new Model("models/BaseSpiderman/Personaje.fbx", translate, camera);
+    Principal* model = new Principal("models/BaseSpiderman/Personaje.fbx", camera);
     model->setTranslate(&translate);
     camera->setFront(v);
     camera->setCharacterHeight(4.0);
@@ -199,7 +200,7 @@ int startGameEngine(void *ptrMsg){
         }
         swapGLBuffers();
     }
-    model = OGLobj->getMainModel();
+    model = (Principal*)OGLobj->getMainModel();
     if (OGLobj != NULL) delete OGLobj;
     if (camera != NULL) delete camera;
     if (model != NULL) delete model;

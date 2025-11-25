@@ -135,6 +135,12 @@
     <ClInclude Include="Recolectable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Villano.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Principal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DemoTemplateOGL.cpp">

@@ -11,6 +11,8 @@
 #include "Animation.h"
 #include "../Recolectable.h"
 #include "../InputDevices/KeyboardInput.h"
+#include "../Villano.h"
+#include "../Principal.h"
 #include <string>
 
 class Scene {
@@ -45,6 +47,23 @@ class Scene {
 
                 if (Recolectable* item = dynamic_cast<Recolectable*>(model)) {
                     item->animar();
+                }
+
+                // Villano AI Update
+                if (Villano* enemigo = dynamic_cast<Villano*>(model)) {
+                    float terrenoY = getTerreno()->Superficie(enemigo->getTranslate()->x, enemigo->getTranslate()->z);
+
+                    enemigo->update(gameTime.deltaTime, *camara->getTranslate(), terrenoY);
+
+                    // Ataque al jugador si esta cerca
+
+                    float distAtaque = glm::distance(*camara->getTranslate(), *enemigo->getTranslate());
+
+                    if (distAtaque < 3.0f) {
+                        if (Principal* jugador = dynamic_cast<Principal*>(camara)) {
+                            jugador->recibirDano(get_nanos() / 1000000.0);
+                        }
+                    }
                 }
 
 				for (int j = 0; j < model->getModelAttributes()->size(); j++){
@@ -82,8 +101,6 @@ class Scene {
                                     }
                                 }
 
-                                INFO("Recolectado: " + collider->name + " (" + std::to_string(conteo) + "/" + std::to_string(total) + ")", "PICKUP");
-
                                 for (Texto* t : *getLoadedText()) {
                                     if (t->name == "ContadorPruebas") {
                                         std::wstring msg = L"Pruebas: " + std::to_wstring(conteo) + L"/" + std::to_wstring(total);
@@ -105,6 +122,8 @@ class Scene {
                     if (j < 0) j = 0;
 				}
 				if (i < 0) i = 0;
+
+
 			}
 			// Actualizamos la camara
             camara->cameraDetails->CamaraUpdate(camara->getRotY(), camara->getTranslate());

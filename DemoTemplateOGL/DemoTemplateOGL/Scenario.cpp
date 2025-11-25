@@ -1,5 +1,7 @@
 #include "Scenario.h"
 #include "Recolectable.h"
+#include "Villano.h"
+#include "Principal.h"
 #include "InputDevices/KeyboardInput.h"
 #ifdef __linux__ 
 #define ZeroMemory(x,y) memset(x,0,y)
@@ -105,7 +107,7 @@ void Scenario::InitGraph(Model *main) {
 	*model->getBonesInfo() = *silly->getBonesInfo();
 	model->setAnimator(silly->getAnimator());
 
-    Model* villano = new Model("models/Villano/Villano_Base.fbx", main->cameraDetails);
+    Villano* villano = new Villano("models/Villano/Villano_Base.fbx", main->cameraDetails);
 
     translate = glm::vec3(20.0f, terreno->Superficie(20.0f, 30.0f), 30.0f);
     scale = glm::vec3(0.02f, 0.02f, 0.02f); // Ajusta la escala, los FBX de Mixamo a veces son enormes o diminutos
@@ -134,17 +136,21 @@ void Scenario::InitGraph(Model *main) {
 
     try {
         // Asegurate que Villano_Idle.fbx este en la carpeta
-        std::vector<Animation> animIdle = Animation::loadAllAnimations("models/Villano/Villano_Walk.fbx", villano->GetBoneInfoMap(), villano->getBonesInfo(), villano->GetBoneCount());
+        std::vector<Animation> animIdle = Animation::loadAllAnimations("models/Villano/Villano_Idle.fbx", villano->GetBoneInfoMap(), villano->getBonesInfo(), villano->GetBoneCount());
 
         // Se la pasamos al modelo principal
         for (Animation anim : animIdle) {
             villano->setAnimator(Animator(anim));
         }
 
-        // Reproducir
-        if (!animIdle.empty()) {
-            villano->setAnimation(0);
+        std::vector<Animation> animWalk = Animation::loadAllAnimations("models/Villano/Villano_Walk.fbx", villano->GetBoneInfoMap(), villano->getBonesInfo(), villano->GetBoneCount());
+
+        for (Animation anim : animWalk) {
+            villano->setAnimator(Animator(anim));
         }
+
+        villano->setAnimation(0);
+
     }
     catch (...) {
         ERRORL("Error cargando animacion Idle del Villano", "ANIM_ERROR");
@@ -478,12 +484,14 @@ void Scenario::InitGraph(Model *main) {
         model->setNextRotY(rotY);
         model->name = "ArbolBosque" + std::to_string(i);
 
-        model->ignoreAABB = true;
-        ModelAttributes& attrArbol = model->getModelAttributes()->at(0);
-        if (attrArbol.hitbox != NULL) {
-            delete (Model*)attrArbol.hitbox; // Liberamos la memoria de la caja
-            attrArbol.hitbox = NULL;         // La ponemos en NULL para que el jugador la ignore
-        }
+        model->getModelAttributes()->at(0).hitbox = NULL;
+
+        //model->ignoreAABB = true;
+        //ModelAttributes& attrArbol = model->getModelAttributes()->at(0);
+        //if (attrArbol.hitbox != NULL) {
+        //    delete (Model*)attrArbol.hitbox; // Liberamos la memoria de la caja
+        //    attrArbol.hitbox = NULL;         // La ponemos en NULL para que el jugador la ignore
+        //}
 
         ourModel.emplace_back(model);
     }
@@ -629,7 +637,11 @@ Scene* Scenario::Render() {
 	for (int i = 0; i < ourText.size(); i++) {
 		ourText[i]->Draw();
 	}
-		// Le decimos a winapi que haga el update en la ventana
+
+    if (Principal* jugador = dynamic_cast<Principal*>(camara)) {
+        jugador->DrawUI(); // Dibujamos solo los corazones
+    }
+
 	return this;
 }
 	
