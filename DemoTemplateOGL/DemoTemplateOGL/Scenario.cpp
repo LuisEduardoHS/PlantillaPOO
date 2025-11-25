@@ -1,4 +1,6 @@
 #include "Scenario.h"
+#include "Recolectable.h"
+#include "InputDevices/KeyboardInput.h"
 #ifdef __linux__ 
 #define ZeroMemory(x,y) memset(x,0,y)
 #define wcscpy_s(x,y,z) wcscpy(x,z)
@@ -337,7 +339,7 @@ void Scenario::InitGraph(Model *main) {
     //model->setNextRotX(270);
     ourModel.emplace_back(model);
 
-    model = new Model("models/Objetos/NOTEBOOK.glb", main->cameraDetails);
+    model = new Recolectable("models/Objetos/NOTEBOOK.glb", main->cameraDetails);
     translate = glm::vec3(50.0f, terreno->Superficie(50.0f, 30.0f) + 2.0f, 150.0f);
     scale = glm::vec3(0.1f, 0.1f, 0.1f);	// it's a bit too big for our scene, so scale it down
     model->name = "Libreta";
@@ -359,7 +361,7 @@ void Scenario::InitGraph(Model *main) {
     model->setNextRotZ(90);
     ourModel.emplace_back(model);
 
-    model = new Model("models/Objetos/MEDIDOR.glb", main->cameraDetails);
+    model = new Recolectable("models/Objetos/MEDIDOR.glb", main->cameraDetails);
     translate = glm::vec3(10.0f, terreno->Superficie(10.0f, 30.0f) + 2.0f, 150.0f);
     scale = glm::vec3(0.0001f, 0.0001f, 0.0001f);	// it's a bit too big for our scene, so scale it down
     model->name = "Medidor";
@@ -370,7 +372,7 @@ void Scenario::InitGraph(Model *main) {
     //model->setNextRotZ(90);
     ourModel.emplace_back(model);
 
-    model = new Model("models/Objetos/MEDIDOR2.glb", main->cameraDetails);
+    model = new Recolectable("models/Objetos/MEDIDOR2.glb", main->cameraDetails);
     translate = glm::vec3(-10.0f, terreno->Superficie(-10.0f, 30.0f) + 2.0f, 150.0f);
     scale = glm::vec3(0.01f, 0.01f, 0.01f);	// it's a bit too big for our scene, so scale it down
     model->name = "Medidor";
@@ -392,7 +394,7 @@ void Scenario::InitGraph(Model *main) {
     //model->setNextRotZ(90);
     ourModel.emplace_back(model);
 
-    model = new Model("models/Objetos/RECORDER.glb", main->cameraDetails);
+    model = new Recolectable("models/Objetos/RECORDER.glb", main->cameraDetails);
     translate = glm::vec3(-50.0f, terreno->Superficie(-50.0f, 30.0f) + 2.0f, 150.0f);
     scale = glm::vec3(0.1f, 0.1f, 0.1f);	// it's a bit too big for our scene, so scale it down
     model->name = "Stones";
@@ -512,6 +514,11 @@ void Scenario::InitGraph(Model *main) {
 	ourText.emplace_back(new Texto(prueba, 20, 0, 0, SCR_HEIGHT, 0, camara));
 	billBoard2D.emplace_back(new Billboard2D((WCHAR*)L"billboards/awesomeface.png", 6, 6, 100, 200, 0, camara->cameraDetails));
 	scale = glm::vec3(100.0f, 100.0f, 0.0f);	// it's a bit too big for our scene, so scale it down
+
+    textoContador = new Texto((WCHAR*)L"Pruebas: 0/5", 20, 0, 10, 50, 0, camara);
+    textoContador->name = "ContadorPruebas";
+    ourText.emplace_back(textoContador);
+
 	billBoard2D.back()->setScale(&scale);
 	}
 
@@ -659,6 +666,15 @@ SkyDome* Scenario::getSky() {
 }
 Terreno* Scenario::getTerreno() {
 	return terreno;
+}
+
+
+
+bool Scenario::removeCollideModel(Model* collider, int idxCollider) {
+    if (collider->name.find("Estructura") != std::string::npos) {
+        return false;
+    }
+    return Scene::removeCollideModel(collider, idxCollider);
 }
 
 Scenario::~Scenario() {

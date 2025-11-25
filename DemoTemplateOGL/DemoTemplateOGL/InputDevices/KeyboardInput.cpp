@@ -85,6 +85,13 @@ bool KeysEvents(GameActions *actions){
 		*actions->jump = 25;
 	}
 
+    if (KEYS[input.E]) {
+        actions->action = true;
+    }
+    else {
+        actions->action = false;
+    }
+
 	// Sprint key
 	if (KEYS[input.Shift]) {
 		actions->sprintPressed = true;

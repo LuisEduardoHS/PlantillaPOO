@@ -15,6 +15,7 @@
 #include "Base/model.h"
 #include "Base/Scene.h"
 #include "Scenario.h"
+#include "Recolectable.h"
 
 #define MAX_LOADSTRING 100
 #ifdef _WIN32 
@@ -291,6 +292,28 @@ bool checkInput(GameActions *actions, Scene* scene) {
     }
     if (actions->getPlayerZoom() != NULL) {
         OGLobj->cameraDetails->calculateZoomPlayer(*actions->getPlayerZoom() * (6 * gameTime.deltaTime / 100));
+    }
+
+    if (actions->action) {
+        glm::vec3 playerPos = *scene->getMainModel()->getTranslate();
+        std::vector<Model*>* modelos = scene->getLoadedModels();
+
+        for (int i = 0; i < modelos->size(); i++) {
+            Model* model = modelos->at(i);
+
+            if (Recolectable* item = dynamic_cast<Recolectable*>(model)) {
+                if (!item->fueRecogido && item->getActive(0)) {
+                    float distancia = glm::distance(playerPos, *item->getTranslate());
+
+                    if (distancia < 5.0f) {
+                        item->fueRecogido = true;
+                        item->setActive(false);
+                        actions->action = false;
+                        break;
+                    }
+                }
+            }
+        }
     }
 
     return true; // siempre buscar colision

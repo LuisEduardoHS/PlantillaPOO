@@ -9,6 +9,9 @@
 #include "Water.h"
 #include "Animator.h"
 #include "Animation.h"
+#include "../Recolectable.h"
+#include "../InputDevices/KeyboardInput.h"
+#include <string>
 
 class Scene {
 	public:
@@ -32,30 +35,74 @@ class Scene {
             angulo = angulo >= 360 ? angulo - 360.0 : angulo;
             setAngulo(angulo);
             getSky()->setRotY(angulo);
+
             Model* camara = getMainModel();
+
 			for (int i = 0; i < getLoadedModels()->size(); i++){
+
 				auto it = getLoadedModels()->begin() + i;
 				Model *collider = NULL, *model = *it;
+
+                if (Recolectable* item = dynamic_cast<Recolectable*>(model)) {
+                    item->animar();
+                }
+
 				for (int j = 0; j < model->getModelAttributes()->size(); j++){
 					int idxCollider = -1;
 					bool objInMovement = (*model->getNextTranslate(j)) != (*model->getTranslate(j));
 					glm::vec3 &posM = objInMovement ? *model->getNextTranslate(j) : *model->getTranslate(j);
 					glm::vec3 ejeColision = glm::vec3(0);
 					bool isPrincipal = model == camara; // Si es personaje principal, activa gravedad
+
 					float terrainY = getTerreno()->Superficie(posM.x, posM.z);
+
 					ModelCollider mcollider = model->update(terrainY, *getLoadedModels(), ejeColision, isPrincipal, j);
+
 					if (mcollider.model != NULL){
 						collider = (Model*)mcollider.model;
 						idxCollider = mcollider.attrIdx;
 					}
-					if (collider != NULL && model == camara){
-						if (ejeColision.y == 1){
-							INFO("APLASTADO!!!! " + collider->name, "JUMP HITBOX_"+to_string(idxCollider));
-							if (removeCollideModel(collider, idxCollider))
-								i--;
-						}
-					}
-					if (j < 0) j = 0;
+                    if (collider != NULL && model == camara) {
+
+                        // --- SISTEMA DE RECOLECCION ---
+                        if (Recolectable* item = dynamic_cast<Recolectable*>(collider)) {
+                            if (KEYS[input.E] && !item->fueRecogido) {
+                                // Recoger
+                                item->fueRecogido = true;
+                                item->setActive(false);
+                                KEYS[input.E] = false;
+
+                                // Contar cuantos llevamos
+                                int conteo = 0;
+                                int total = 0;
+                                for (Model* m : *getLoadedModels()) {
+                                    if (Recolectable* r = dynamic_cast<Recolectable*>(m)) {
+                                        total++;
+                                        if (r->fueRecogido) conteo++;
+                                    }
+                                }
+
+                                INFO("Recolectado: " + collider->name + " (" + std::to_string(conteo) + "/" + std::to_string(total) + ")", "PICKUP");
+
+                                for (Texto* t : *getLoadedText()) {
+                                    if (t->name == "ContadorPruebas") {
+                                        std::wstring msg = L"Pruebas: " + std::to_wstring(conteo) + L"/" + std::to_wstring(total);
+                                        t->initTexto((WCHAR*)msg.c_str());
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        // ------------------------------
+
+                        // Aplastar
+                        if (ejeColision.y == 1) {
+                            INFO("APLASTADO!!!! " + collider->name, "JUMP HITBOX_" + std::to_string(idxCollider));
+                            if (removeCollideModel(collider, idxCollider))
+                                i--;
+                        }
+                    }
+                    if (j < 0) j = 0;
 				}
 				if (i < 0) i = 0;
 			}

@@ -31,6 +31,9 @@ private:
 	float angulo;
 	float animacion = 0;
 	std::vector<Texto*> ourText;
+    int pruebasRecolectadas = 0;
+    const int totalPruebas = 5;
+    Texto* textoContador = NULL;
 public:
 	Scenario(Camera *cam);
 	Scenario(Model *camIni);
@@ -53,6 +56,8 @@ public:
 	void setAngulo(float angulo);
 	SkyDome* getSky();
 	Terreno* getTerreno();
+
+    bool removeCollideModel(Model* collider, int idxCollider) override;
 //    void update() override;
     ~Scenario();
 };
