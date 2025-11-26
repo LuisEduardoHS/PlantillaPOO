@@ -48,68 +48,6 @@ void Scenario::InitGraph(Model *main) {
 
 	ModelAttributes m;
 
-
-	model = new Model("models/dancing_vampire/dancing_vampire.dae", main->cameraDetails);
-	translate = glm::vec3(0.0f, terreno->Superficie(0.0f, 60.0f), 60.0f);
-	scale = glm::vec3(0.02f, 0.02f, 0.02f);	// it's a bit too big for our scene, so scale it down
-	model->setTranslate(&translate);
-	model->setNextTranslate(&translate);
-	model->setScale(&scale);
-	model->setNextRotY(90);
-	ourModel.emplace_back(model);
-	try{
-		std::vector<Animation> animations = Animation::loadAllAnimations("models/dancing_vampire/dancing_vampire.dae", model->GetBoneInfoMap(), model->getBonesInfo(), model->GetBoneCount());
-		std::vector<Animation> animation = Animation::loadAllAnimations("models/dancing_vampire/dancing_vampire.dae", model->GetBoneInfoMap(), model->getBonesInfo(), model->GetBoneCount());
-		std::move(animation.begin(), animation.end(), std::back_inserter(animations));
-		for (Animation animation : animations)
-			model->setAnimator(Animator(animation));
-		model->setAnimation(1);
-	}catch(...){
-		ERRORL("Could not load animation!", "ANIMACION");
-	}
-
-	Model* silly = new Model("models/Silly_Dancing/Silly_Dancing.fbx", main->cameraDetails);
-	translate = glm::vec3(10.0f, terreno->Superficie(10.0f, 60.0f) , 60.0f);
-	scale = glm::vec3(0.02f, 0.02f, 0.02f);	// it's a bit too big for our scene, so scale it down
-	silly->setTranslate(&translate);
-	silly->setNextTranslate(&translate);
-	silly->setScale(&scale);
-	silly->setNextRotY(180);
-	ourModel.emplace_back(silly);
-	try{
-		std::vector<Animation> animations = Animation::loadAllAnimations("models/Silly_Dancing/Silly_Dancing.fbx", silly->GetBoneInfoMap(), silly->getBonesInfo(), silly->GetBoneCount());
-		for (Animation animation : animations)
-			silly->setAnimator(Animator(animation));
-		silly->setAnimation(0);
-	}catch(...){
-		ERRORL("Could not load animation!", "ANIMACION");
-	}
-	model = CollitionBox::GenerateAABB(translate, silly->AABBsize, main->cameraDetails);
-	m.hitbox = model; // Le decimos al ultimo ModelAttribute que tiene un hitbox asignado
-	silly->getModelAttributes()->push_back(m);
-	translate.x += 10;
-	silly->setTranslate(&translate, silly->getModelAttributes()->size()-1);
-	silly->setNextTranslate(&translate, silly->getModelAttributes()->size()-1);
-	silly->setScale(&scale, silly->getModelAttributes()->size()-1);
-	silly->setNextRotY(180, silly->getModelAttributes()->size()-1);
-	silly->setRotY(180, silly->getModelAttributes()->size()-1);
-	// Import model and clone with bones and animations
-	model = new Model("models/Silly_Dancing/Silly_Dancing.fbx", main->cameraDetails);
-	translate = glm::vec3(30.0f, terreno->Superficie(30.0f, 60.0f) , 60.0f);
-	scale = glm::vec3(0.02f, 0.02f, 0.02f);	// it's a bit too big for our scene, so scale it down
-	model->name = "Silly_Dancing1";
-	model->setTranslate(&translate);
-	model->setNextTranslate(&translate);
-	model->setScale(&scale);
-	model->setNextRotY(180);
-	ourModel.emplace_back(model);
-	// Para clonar la animacion se eliminan los huesos del modelo actual y se copian los modelos y animators
-	model->GetBoneInfoMap()->clear();
-	model->getBonesInfo()->clear();
-	*model->GetBoneInfoMap() = *silly->GetBoneInfoMap();
-	*model->getBonesInfo() = *silly->getBonesInfo();
-	model->setAnimator(silly->getAnimator());
-
     Villano* villano = new Villano("models/Villano/Villano_Base.fbx", main->cameraDetails);
 
     translate = glm::vec3(20.0f, terreno->Superficie(20.0f, 30.0f), 30.0f);
@@ -521,20 +459,34 @@ void Scenario::InitGraph(Model *main) {
 	
 
 	inicializaBillboards();
-	std::wstring prueba(L"Esta es una prueba");
-	ourText.emplace_back(new Texto(prueba, 20, 0, 0, SCR_HEIGHT, 0, camara));
-	billBoard2D.emplace_back(new Billboard2D((WCHAR*)L"billboards/awesomeface.png", 6, 6, 100, 200, 0, camara->cameraDetails));
-	scale = glm::vec3(100.0f, 100.0f, 0.0f);	// it's a bit too big for our scene, so scale it down
 
     textoContador = new Texto((WCHAR*)L"Pruebas: 0/5", 20, 0, 10, 50, 0, camara);
     textoContador->name = "ContadorPruebas";
     ourText.emplace_back(textoContador);
 
-	billBoard2D.back()->setScale(&scale);
+
+    // ------------------ INICIALIZAR LLUVIA -----------------------
+    WCHAR* texturaGota = (WCHAR*)L"billboards/drop.png";
+
+    for (int i = 0; i < 350; i++) {
+        float x = (rand() % 800) - 400;
+        float z = (rand() % 800) - 400;
+        float y = (rand() % 200) + 50;
+
+        // Creamos la gota
+        Billboard* gota = new Billboard(
+            texturaGota,
+            0.3f, 0.7f,
+            x, y, z, 
+            camara->cameraDetails
+        );
+
+        lluviaBillboards.push_back(gota);
+    }
 	}
 
 void Scenario::inicializaBillboards() {
-	float ye = terreno->Superficie(0, 0);
+	/*float ye = terreno->Superficie(0, 0);
 	billBoard.emplace_back(new Billboard((WCHAR*)L"billboards/Arbol.png", 6, 6, 0, ye - 1, 0, camara->cameraDetails));
 
 	ye = terreno->Superficie(-9, -15);
@@ -552,7 +504,7 @@ void Scenario::inicializaBillboards() {
 		wcscat_s(textura, 50, L".png");
 		billBoardAnimated->pushFrame(new Billboard((WCHAR*)textura, 6, 6, 5, ye - 1, -5, camara->cameraDetails));		
 	}
-	billBoardAnim.emplace_back(billBoardAnimated);
+	billBoardAnim.emplace_back(billBoardAnimated);*/
 
     // Generar billboards aleatorios en el fondo del bosque
     const int numBillboards = 200;  // Número de billboards para densidad
@@ -643,6 +595,32 @@ Scene* Scenario::Render() {
 
     if (Principal* jugador = dynamic_cast<Principal*>(camara)) {
         jugador->DrawUI(); // Dibujamos solo los corazones
+    }
+
+    if (lluviaActiva) {
+        for (int i = 0; i < lluviaBillboards.size(); i++) {
+            Billboard* g = lluviaBillboards[i];
+            glm::vec3* pos = g->getTranslate();
+
+            // 1. Caida (Gravedad)
+            // Corregimos el error de sintaxis de tu ejemplo (faltaba el *)
+            pos->y -= 5.0f * (gameTime.deltaTime / 10.0f);
+
+            // 2. Reciclaje (Si cae al suelo)
+            // Usamos una altura fija (ej. 0) o la del terreno si quieres precision
+            if (pos->y < 0) {
+                pos->y = (rand() % 100) + 100; // Regresa arriba
+                pos->x = camara->getTranslate()->x - 100 + (rand() % 200); // Cae cerca del jugador
+                pos->z = camara->getTranslate()->z - 100 + (rand() % 200);
+            }
+
+            // Actualizar posicion
+            g->setTranslate(pos);
+            g->setNextTranslate(pos);
+
+            // 3. Dibujar
+            g->Draw();
+        }
     }
 
 	return this;

@@ -55,6 +55,7 @@ int finishProgram(void *ptr);
 int gamePadEvents(GameActions *actions);
 void updatePosCords(Texto* coordenadas);
 void updateFPS(Texto *fps, int totFrames);
+bool lluviaActiva = false;
 int startGameEngine(void* ptrMsg);
 
 // Propiedades de la ventana
@@ -325,7 +326,17 @@ bool checkInput(GameActions *actions, Scene* scene) {
         }
     }
 
-    return true; // siempre buscar colision
+    // Lluvia
+    if (KEYS[input.L]) {
+        lluviaActiva = !lluviaActiva;
+
+        KEYS[input.L] = false;
+
+        if (lluviaActiva) std::cout << "Si Lluvia" << std::endl;
+        else std::cout << "No Lluvia" << std::endl;
+    }
+
+    return true;
 }
 
 #ifdef _WIN32

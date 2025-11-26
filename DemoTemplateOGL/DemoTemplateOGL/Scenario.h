@@ -2,6 +2,7 @@
 #define GRAPHICSRR_H
 
 #ifdef _WIN32 
+
 #include <windows.h>
 #include <windowsx.h>
 #endif
@@ -17,6 +18,8 @@
 #include "Texto.h"
 #include "Billboard2D.h"
 #include "CollitionBox.h"
+
+extern bool lluviaActiva;
 
 class Scenario : public Scene {
 private:
@@ -34,6 +37,7 @@ private:
     int pruebasRecolectadas = 0;
     const int totalPruebas = 5;
     Texto* textoContador = NULL;
+    std::vector<Billboard*> lluviaBillboards;
 public:
 	Scenario(Camera *cam);
 	Scenario(Model *camIni);
