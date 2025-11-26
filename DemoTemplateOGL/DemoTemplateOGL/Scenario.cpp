@@ -182,7 +182,7 @@ void Scenario::InitGraph(Model *main) {
     // 2. PARED IZQUIERDA (Mirando desde la entrada)
     CollitionBox* paredIzq = new CollitionBox(
         posEdificio.x - 45.0f, posEdificio.y + 20.0f, posEdificio.z - 10, // Movida a la izquierda
-        2.0f, 50.0f, 80.0f, // Delgada en X, Alta en Y, Larga en Z
+        2.0f, 20.0f, 80.0f, // Delgada en X, Alta en Y, Larga en Z
         main->cameraDetails
     );
     ourModel.emplace_back(paredIzq);
@@ -198,7 +198,7 @@ void Scenario::InitGraph(Model *main) {
     // 4. PARED TRASERA(AHORA ES SOLIDA EN EL LADO "POSITIVO")
         CollitionBox * paredFondo = new CollitionBox(
             posEdificio.x, posEdificio.y + 20.0f, posEdificio.z + 100.0f, // CAMBIO: +100 en vez de -100
-            70.0f, 50.0f, 2.0f,
+            70.0f, 20.0f, 2.0f,
             main->cameraDetails
         );
     ourModel.emplace_back(paredFondo);

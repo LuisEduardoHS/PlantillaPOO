@@ -24,7 +24,7 @@ public:
         // Creamos 3 corazones
         for (int i = 0; i < 3; i++) {
             float xPos = 50.0f + (i * 60.0f);
-            Billboard2D* corazon = new Billboard2D((WCHAR*)L"textures/corazon.webp", 6, 6, xPos, 50, 0, this->cameraDetails);
+            Billboard2D* corazon = new Billboard2D((WCHAR*)L"textures/corazon.webp", 6, 6, xPos, 100, 0, this->cameraDetails);
             corazon->setScale(&scale);
             vidas.push_back(corazon);
         }
