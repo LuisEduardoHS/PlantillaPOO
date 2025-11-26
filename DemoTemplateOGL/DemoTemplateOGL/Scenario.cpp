@@ -128,26 +128,6 @@ void Scenario::InitGraph(Model *main) {
     // Agregar a la escena
     ourModel.emplace_back(villano);
 
-    /*
-    model = new Model("models/Villano/Zombie.fbx", main->cameraDetails);
-    translate = glm::vec3(100.0f, terreno->Superficie(100.0f, 60.0f), 0.0f);
-    scale = glm::vec3(0.02f, 0.02f, 0.02f);	// it's a bit too big for our scene, so scale it down
-    model->setTranslate(&translate);
-    model->setNextTranslate(&translate);
-    model->setScale(&scale);
-    model->setNextRotY(90);
-    ourModel.emplace_back(model);
-    try {
-        std::vector<Animation> animations = Animation::loadAllAnimations("models/Villano/Walking.fbx", silly->GetBoneInfoMap(), silly->getBonesInfo(), silly->GetBoneCount());
-        for (Animation animation : animations)
-            silly->setAnimator(Animator(animation));
-        silly->setAnimation(0);
-    }
-    catch (...) {
-        ERRORL("Could not load animation!", "ANIMACION");
-    }
-    */
-
 	model = new Model("models/Arbol1/pine_tree.glb", main->cameraDetails);
 	translate = glm::vec3(100.0f, terreno->Superficie(100.0f, 30.0f), 30.0f);
 	scale = glm::vec3(0.1f, 0.1f, 0.1f);	// it's a bit too big for our scene, so scale it down
@@ -201,16 +181,16 @@ void Scenario::InitGraph(Model *main) {
 
     // 2. PARED IZQUIERDA (Mirando desde la entrada)
     CollitionBox* paredIzq = new CollitionBox(
-        posEdificio.x - 65.0f, posEdificio.y + 20.0f, posEdificio.z, // Movida a la izquierda
-        2.0f, 50.0f, 120.0f, // Delgada en X, Alta en Y, Larga en Z
+        posEdificio.x - 45.0f, posEdificio.y + 20.0f, posEdificio.z - 10, // Movida a la izquierda
+        2.0f, 50.0f, 80.0f, // Delgada en X, Alta en Y, Larga en Z
         main->cameraDetails
     );
     ourModel.emplace_back(paredIzq);
 
     // 3. PARED DERECHA
     CollitionBox* paredDer = new CollitionBox(
-        posEdificio.x + 65.0f, posEdificio.y + 20.0f, posEdificio.z, // Movida a la derecha
-        2.0f, 50.0f, 120.0f,
+        posEdificio.x + 45.0f, posEdificio.y + 20.0f, posEdificio.z + 8, // Movida a la derecha
+        2.0f, 20.0f, 100.0f,
         main->cameraDetails
     );
     ourModel.emplace_back(paredDer);
@@ -225,16 +205,16 @@ void Scenario::InitGraph(Model *main) {
 
     // 5. PARED FRENTE IZQUIERDA (AHORA CON HUECO EN EL LADO "NEGATIVO")
     CollitionBox* paredFrente1 = new CollitionBox(
-        posEdificio.x - 40.0f, posEdificio.y + 20.0f, posEdificio.z - 100.0f, // CAMBIO: -100 en vez de +100
-        30.0f, 50.0f, 2.0f,
+        posEdificio.x - 23.0f, posEdificio.y + 20.0f, posEdificio.z - 90.0f, // CAMBIO: -100 en vez de +100
+        25.0f, 20.0f, 2.0f,
         main->cameraDetails
     );
     ourModel.emplace_back(paredFrente1);
 
     // 6. PARED FRENTE DERECHA
     CollitionBox* paredFrente2 = new CollitionBox(
-        posEdificio.x + 40.0f, posEdificio.y + 20.0f, posEdificio.z - 100.0f, // CAMBIO: -100 en vez de +100
-        30.0f, 50.0f, 2.0f,
+        posEdificio.x + 40.0f, posEdificio.y + 20.0f, posEdificio.z - 90.0f, // CAMBIO: -100 en vez de +100
+        3.0f, 20.0f, 2.0f,
         main->cameraDetails
     );
     ourModel.emplace_back(paredFrente2);
@@ -330,7 +310,7 @@ void Scenario::InitGraph(Model *main) {
     //model->setNextRotZ(90);
     ourModel.emplace_back(model);
 
-    model = new Model("models/Objetos/STONES.glb", main->cameraDetails);
+    model = new Recolectable("models/Objetos/STONES.glb", main->cameraDetails);
     translate = glm::vec3(-30.0f, terreno->Superficie(-30.0f, 30.0f) + 2.0f, 150.0f);
     scale = glm::vec3(4.f, 4.f, 4.f);	// it's a bit too big for our scene, so scale it down
     model->name = "Stones";

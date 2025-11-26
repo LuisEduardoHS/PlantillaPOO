@@ -43,6 +43,19 @@ public:
         }
     }
 
+    void reiniciar() {
+        for (Billboard2D* vida : vidas) {
+            delete vida;
+        }
+        vidas.clear();
+
+        asignarvidas();
+
+        tiempoUltimoGolpe = 0;
+
+        std::cout << "JUGADOR REINICIADO: Vidas completas." << std::endl;
+    }
+
     void DrawUI() {
         for (Billboard2D* vida : vidas) {
             vida->Draw();

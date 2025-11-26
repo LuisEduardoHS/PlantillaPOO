@@ -17,6 +17,10 @@
 
 class Scene {
 	public:
+        int estadoJuego = 0; // 0 = JUGANDO, 1 = GAME OVER, 2 = VICTORIA
+        bool mensajeMostrado = false;
+        float tiempoEnAgua = 0.0f;
+
 		virtual float getAngulo() = 0;
 		virtual void setAngulo(float angulo) = 0;
 		virtual Model* getMainModel() = 0;
@@ -29,11 +33,42 @@ class Scene {
 		virtual std::vector<BillboardAnimation*> *getLoadedBillboardsAnimation() = 0;
 		virtual std::vector<Billboard2D*> *getLoadedBillboards2D() = 0;
 		virtual std::vector<Texto*> *getLoadedText() = 0;
-        float tiempoEnAgua = 0.0f;
 		virtual ~Scene(){
 		};
 
+        void calcularPuntaje(int& recogidos, int& totales) {
+            recogidos = 0;
+            totales = 0;
+            for (Model* m : *getLoadedModels()) {
+                if (Recolectable* r = dynamic_cast<Recolectable*>(m)) {
+                    totales++;
+                    if (r->fueRecogido) recogidos++;
+                }
+            }
+        }
+
 		virtual int update(){
+
+            if (estadoJuego != 0) {
+                // --- DE FIN DE JUEGO ---
+                if (!mensajeMostrado) {
+                    if (estadoJuego == 1) {
+                        INFO("HAS MUERTO.\n\nPresiona ACEPTAR y luego ENTER para reiniciar.", "GAME OVER");
+                    }
+                    else if (estadoJuego == 2) {
+                        INFO("MISION CUMPLIDA: Todas las pruebas recolectadas.\n\nPresiona ACEPTAR y luego ENTER para reiniciar.", "VICTORIA");
+                    }
+                    mensajeMostrado = true;
+                }
+
+                // --- REINICIO CON TECLA ENTER ---
+                if (KEYS[input.Enter]) {
+                    reiniciarJuego();
+                }
+
+                return -1; // Detenemos
+            }
+
 			float angulo = getAngulo() + 0.1 * gameTime.deltaTime / 100; // SkyDome rotation
             angulo = angulo >= 360 ? angulo - 360.0 : angulo;
             setAngulo(angulo);
@@ -41,11 +76,15 @@ class Scene {
 
             Model* camara = getMainModel();
 
+            int itemsRecogidos = 0;
+            int itemsTotales = 0;
+
 			for (int i = 0; i < getLoadedModels()->size(); i++){
 
 				auto it = getLoadedModels()->begin() + i;
 				Model *collider = NULL, *model = *it;
 
+                // Recolectables Animation
                 if (Recolectable* item = dynamic_cast<Recolectable*>(model)) {
                     item->animar();
                 }
@@ -67,6 +106,7 @@ class Scene {
                     }
                 }
 
+                // Actualizacion y colisiones
 				for (int j = 0; j < model->getModelAttributes()->size(); j++){
 					int idxCollider = -1;
 					bool objInMovement = (*model->getNextTranslate(j)) != (*model->getTranslate(j));
@@ -82,51 +122,36 @@ class Scene {
 						collider = (Model*)mcollider.model;
 						idxCollider = mcollider.attrIdx;
 					}
-                    if (collider != NULL && model == camara) {
 
-                        // --- SISTEMA DE RECOLECCION ---
+                    if (collider != NULL && model == camara) {
+                        // Recoleccion
                         if (Recolectable* item = dynamic_cast<Recolectable*>(collider)) {
                             if (KEYS[input.E] && !item->fueRecogido) {
-                                // Recoger
                                 item->fueRecogido = true;
                                 item->setActive(false);
                                 KEYS[input.E] = false;
 
-                                // Contar cuantos llevamos
-                                int conteo = 0;
-                                int total = 0;
-                                for (Model* m : *getLoadedModels()) {
-                                    if (Recolectable* r = dynamic_cast<Recolectable*>(m)) {
-                                        total++;
-                                        if (r->fueRecogido) conteo++;
-                                    }
-                                }
-
-                                for (Texto* t : *getLoadedText()) {
-                                    if (t->name == "ContadorPruebas") {
-                                        std::wstring msg = L"Pruebas: " + std::to_wstring(conteo) + L"/" + std::to_wstring(total);
-                                        t->initTexto((WCHAR*)msg.c_str());
-                                        break;
-                                    }
-                                }
+                                int r = 0, t = 0;
+                                calcularPuntaje(r, t);
+                                actualizarTextoUI(r, t);
                             }
                         }
-                        // ------------------------------
-
-                        // Aplastar
+                        // Aplastamiento
                         if (ejeColision.y == 1) {
-                            INFO("APLASTADO!!!! " + collider->name, "JUMP HITBOX_" + std::to_string(idxCollider));
-                            if (removeCollideModel(collider, idxCollider))
-                                i--;
+                            //INFO("APLASTADO!!!! " + collider->name, "COLLISION");
+                            if (removeCollideModel(collider, idxCollider)) i--;
                         }
                     }
+
                     if (j < 0) j = 0;
 				}
 				if (i < 0) i = 0;
-
-                
-
 			}
+
+            int rec = 0, tot = 0;
+            calcularPuntaje(rec, tot);
+
+            if (tot > 0 && rec >= tot) estadoJuego = 2;
 
             // Agua
 
@@ -159,10 +184,94 @@ class Scene {
                 }
             }
 
+            // Validamos que itemsTotales > 0 para no ganar al inicio si no han cargado
+            if (itemsTotales > 0 && itemsRecogidos >= itemsTotales) {
+                estadoJuego = 2; // WIN
+            }
+
+            // B) DERROTA (Sin vidas)
+            if (Principal* jugador = dynamic_cast<Principal*>(camara)) {
+                if (jugador->vidas.empty()) {
+                    estadoJuego = 1; // LOSE
+                }
+            }
+
+            // C) DAÑO AMBIENTAL (Rio)
+            if (Principal* jugador = dynamic_cast<Principal*>(camara)) {
+                glm::vec3 pos = *jugador->getTranslate();
+                // Limites del Rio (Ajusta a tus valores)
+                if (pos.x > -500 && pos.x < 500 && pos.z > -35 && pos.z < 35 && pos.y < 12) {
+                    tiempoEnAgua += gameTime.deltaTime / 1000.0f;
+                    if (tiempoEnAgua >= 5.0f) {
+                        jugador->recibirDano(get_nanos() / 1000000.0);
+                        tiempoEnAgua = 0.0f;
+                    }
+                }
+                else tiempoEnAgua = 0.0f;
+            }
+
 			// Actualizamos la camara
             camara->cameraDetails->CamaraUpdate(camara->getRotY(), camara->getTranslate());
 
             return -1;
+        }
+
+        void reiniciarJuego() {
+            estadoJuego = 0;
+            mensajeMostrado = false;
+            tiempoEnAgua = 0;
+
+            // 1. Revivir Jugador
+            if (Principal* jugador = dynamic_cast<Principal*>(getMainModel())) {
+                jugador->reiniciar();
+
+                // [OPCIONAL] Resetear posicion inicial (ej. 5, 10, -5)
+                glm::vec3 respawn = glm::vec3(5.0f, 10.0f, -5.0f);
+                jugador->setTranslate(&respawn);
+                jugador->setNextTranslate(&respawn);
+            }
+
+            // 2. Resetear Items
+            int total = 0;
+            for (Model* m : *getLoadedModels()) {
+                // Reset Items
+                if (Recolectable* item = dynamic_cast<Recolectable*>(m)) {
+                    item->fueRecogido = false;
+                    item->setActive(true);
+                    total++;
+                }
+                if (Villano* v = dynamic_cast<Villano*>(m)) {
+                    // Posicion inicial del villano (Coordenadas del Dia 1)
+                    float terrenoY = getTerreno()->Superficie(20.0f, 30.0f);
+                    glm::vec3 inicioVillano = glm::vec3(20.0f, terrenoY, 30.0f);
+                    v->setTranslate(&inicioVillano);
+                    v->setNextTranslate(&inicioVillano);
+                    v->setAnimation(0); // Idle
+                }
+            }
+
+            // 3. Resetear Texto UI
+            actualizarTextoUI(0, total);
+        }
+
+        // --- ACTUALIZAR UI ---
+        void actualizarTextoUI(int recogidos, int totales) {
+            std::vector<Texto*>* listaTextos = getLoadedText();
+            for (int k = 0; k < listaTextos->size(); k++) {
+                if (listaTextos->at(k)->name == "ContadorPruebas") {
+                    // Metodo Destruir y Recrear (Infalible)
+                    delete listaTextos->at(k);
+                    listaTextos->erase(listaTextos->begin() + k);
+
+                    wchar_t buffer[100];
+                    swprintf(buffer, 100, L"Pruebas: %d/%d", recogidos, totales);
+
+                    Texto* nuevoTexto = new Texto(buffer, 20, 0, 10, 50, 0, getMainModel());
+                    nuevoTexto->name = "ContadorPruebas";
+                    listaTextos->push_back(nuevoTexto);
+                    break;
+                }
+            }
         }
 
 		virtual bool removeCollideModel(Model* collider, int idxCollider){
