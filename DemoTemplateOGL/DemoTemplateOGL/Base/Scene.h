@@ -47,7 +47,7 @@ class Scene {
             }
         }
 
-		virtual int update(){
+        virtual int update() {
 
             if (estadoJuego != 0) {
                 // --- DE FIN DE JUEGO ---
@@ -69,7 +69,7 @@ class Scene {
                 return -1; // Detenemos
             }
 
-			float angulo = getAngulo() + 0.1 * gameTime.deltaTime / 100; // SkyDome rotation
+            float angulo = getAngulo() + 0.1 * gameTime.deltaTime / 100; // SkyDome rotation
             angulo = angulo >= 360 ? angulo - 360.0 : angulo;
             setAngulo(angulo);
             getSky()->setRotY(angulo);
@@ -79,10 +79,10 @@ class Scene {
             int itemsRecogidos = 0;
             int itemsTotales = 0;
 
-			for (int i = 0; i < getLoadedModels()->size(); i++){
+            for (int i = 0; i < getLoadedModels()->size(); i++) {
 
-				auto it = getLoadedModels()->begin() + i;
-				Model *collider = NULL, *model = *it;
+                auto it = getLoadedModels()->begin() + i;
+                Model* collider = NULL, * model = *it;
 
                 // Recolectables Animation
                 if (Recolectable* item = dynamic_cast<Recolectable*>(model)) {
@@ -96,7 +96,6 @@ class Scene {
                     enemigo->update(gameTime.deltaTime, *camara->getTranslate(), terrenoY);
 
                     // Ataque al jugador si esta cerca
-
                     float distAtaque = glm::distance(*camara->getTranslate(), *enemigo->getTranslate());
 
                     if (distAtaque < 3.0f) {
@@ -107,21 +106,21 @@ class Scene {
                 }
 
                 // Actualizacion y colisiones
-				for (int j = 0; j < model->getModelAttributes()->size(); j++){
-					int idxCollider = -1;
-					bool objInMovement = (*model->getNextTranslate(j)) != (*model->getTranslate(j));
-					glm::vec3 &posM = objInMovement ? *model->getNextTranslate(j) : *model->getTranslate(j);
-					glm::vec3 ejeColision = glm::vec3(0);
-					bool isPrincipal = model == camara; // Si es personaje principal, activa gravedad
+                for (int j = 0; j < model->getModelAttributes()->size(); j++) {
+                    int idxCollider = -1;
+                    bool objInMovement = (*model->getNextTranslate(j)) != (*model->getTranslate(j));
+                    glm::vec3& posM = objInMovement ? *model->getNextTranslate(j) : *model->getTranslate(j);
+                    glm::vec3 ejeColision = glm::vec3(0);
+                    bool isPrincipal = model == camara; // Si es personaje principal, activa gravedad
 
-					float terrainY = getTerreno()->Superficie(posM.x, posM.z);
+                    float terrainY = getTerreno()->Superficie(posM.x, posM.z);
 
-					ModelCollider mcollider = model->update(terrainY, *getLoadedModels(), ejeColision, isPrincipal, j);
+                    ModelCollider mcollider = model->update(terrainY, *getLoadedModels(), ejeColision, isPrincipal, j);
 
-					if (mcollider.model != NULL){
-						collider = (Model*)mcollider.model;
-						idxCollider = mcollider.attrIdx;
-					}
+                    if (mcollider.model != NULL) {
+                        collider = (Model*)mcollider.model;
+                        idxCollider = mcollider.attrIdx;
+                    }
 
                     if (collider != NULL && model == camara) {
                         // Recoleccion
@@ -131,9 +130,6 @@ class Scene {
                                 item->setActive(false);
                                 KEYS[input.E] = false;
 
-                                int r = 0, t = 0;
-                                calcularPuntaje(r, t);
-                                actualizarTextoUI(r, t);
                             }
                         }
                         // Aplastamiento
@@ -144,12 +140,20 @@ class Scene {
                     }
 
                     if (j < 0) j = 0;
-				}
-				if (i < 0) i = 0;
-			}
+                }
+                if (i < 0) i = 0;
+            }
 
             int rec = 0, tot = 0;
             calcularPuntaje(rec, tot);
+
+            // Actualizar UI solo cuando cambie el valor
+            static int prevRec = -1, prevTot = -1;
+            if (rec != prevRec || tot != prevTot) {
+                actualizarTextoUI(rec, tot);
+                prevRec = rec;
+                prevTot = tot;
+            }
 
             if (tot > 0 && rec >= tot) estadoJuego = 2;
 
@@ -210,7 +214,7 @@ class Scene {
                 else tiempoEnAgua = 0.0f;
             }
 
-			// Actualizamos la camara
+            // Actualizamos la camara
             camara->cameraDetails->CamaraUpdate(camara->getRotY(), camara->getTranslate());
 
             return -1;
