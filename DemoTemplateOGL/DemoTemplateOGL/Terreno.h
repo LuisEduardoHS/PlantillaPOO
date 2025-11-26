@@ -37,6 +37,37 @@ public:
 		wcstombs(stext, (wchar_t*)alturas, 1024);
 #endif
 		unsigned char* mapaAlturas = loadFile(stext, &mapAlturaX, &mapAlturaY, &mapAlturaComp, 0);
+
+        if (mapaAlturas) {
+            int centroX = mapAlturaX / 2;
+            int centroZ = mapAlturaY / 2;
+
+            // Calculamos los limites en pixeles basados en el tamaño del terreno (2000x2000)
+            // Ancho Rio (1000) es el 50% del terreno (0.5)
+            int radioX = (mapAlturaX * 0.5) / 2;
+
+            // Largo Rio (70) es el 3.5% del terreno (0.035)
+            int radioZ = (mapAlturaY * 0.035) / 2;
+
+            // Limites exactos del rectangulo
+            int minX = centroX - radioX;
+            int maxX = centroX + radioX;
+            int minZ = centroZ - radioZ;
+            int maxZ = centroZ + radioZ;
+
+            for (int z = 0; z < mapAlturaY; z++) {
+                for (int x = 0; x < mapAlturaX; x++) {
+                    // AHORA VERIFICAMOS QUE ESTE DENTRO DE X Y DENTRO DE Z
+                    if (x > minX && x < maxX && z > minZ && z < maxZ) {
+                        int index = (z * mapAlturaX + x) * mapAlturaComp;
+
+                        if (index < mapAlturaX * mapAlturaY * mapAlturaComp) {
+                            mapaAlturas[index] = 0; // Fondo del hueco
+                        }
+                    }
+                }
+            }
+        }
 		//en caso del puntero de la imagen sea nulo se brica esta opcion
 		UTILITIES_OGL::Maya terreno = UTILITIES_OGL::Plano(mapAlturaX, mapAlturaY, ancho, prof, mapaAlturas, mapAlturaComp, 30);
 		UTILITIES_OGL::vectoresEsfera(terreno, vertices, indices, mapAlturaX * mapAlturaY * 3, (mapAlturaX - 1) * (mapAlturaY - 1) * 6);

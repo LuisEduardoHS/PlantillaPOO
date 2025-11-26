@@ -32,12 +32,15 @@ void Scenario::InitGraph(Model *main) {
 	sky = new SkyDome(32, 32, 20, (WCHAR*)L"skydome/CIELO2.jpg", main->cameraDetails);
 	//creamos el terreno
 	terreno = new Terreno((WCHAR*)L"skydome/PISO2.jpg", (WCHAR*)L"skydome/coast_sand_rocks_02_diff.jpg", 2000, 2000, main->cameraDetails);
-	water = new Water((WCHAR*)L"textures/terreno.bmp", (WCHAR*)L"textures/water.bmp", 20, 20, camara->cameraDetails);
+	water = new Water((WCHAR*)L"textures/terreno.bmp", (WCHAR*)L"textures/water.bmp", 1000, 70, camara->cameraDetails);
 	glm::vec3 translate;
 	glm::vec3 scale;
 	glm::vec3 rotation;
-	translate = glm::vec3(0.0f, 20.0f, 30.0f);
+    water->setRotX(180.0f);
+    water->setNextRotX(180.0f);
+	translate = glm::vec3(0.0f, 1.0f, 0.0f);
 	water->setTranslate(&translate);
+    water->setNextTranslate(&translate);
 	// load models
 	// -----------
 	ourModel.emplace_back(main);

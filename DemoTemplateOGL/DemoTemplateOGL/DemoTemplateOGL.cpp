@@ -76,6 +76,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                      _In_ LPWSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
+    // --- [ACTIVAR CONSOLA DE DEPURACION] ---
+    AllocConsole();
+    FILE* fp;
+    freopen_s(&fp, "CONOUT$", "w", stdout); // Redirige std::cout a la consola
+    freopen_s(&fp, "CONOUT$", "w", stderr); // Redirige std::cerr a la consola
+    std::cout << "Consola de Depuracion Activada" << std::endl;
+    // ---------------------------------------
+
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
     // Initialize global strings

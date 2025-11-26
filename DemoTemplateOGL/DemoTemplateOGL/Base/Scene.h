@@ -29,6 +29,7 @@ class Scene {
 		virtual std::vector<BillboardAnimation*> *getLoadedBillboardsAnimation() = 0;
 		virtual std::vector<Billboard2D*> *getLoadedBillboards2D() = 0;
 		virtual std::vector<Texto*> *getLoadedText() = 0;
+        float tiempoEnAgua = 0.0f;
 		virtual ~Scene(){
 		};
 
@@ -123,8 +124,41 @@ class Scene {
 				}
 				if (i < 0) i = 0;
 
+                
 
 			}
+
+            // Agua
+
+            if (Principal* jugador = dynamic_cast<Principal*>(camara)) {
+                glm::vec3 pos = *jugador->getTranslate();
+
+                // Limites
+                bool enX = (pos.x > -500.0f && pos.x < 500.0f);
+                bool enZ = (pos.z > -35.0f && pos.z < 35.0f);
+                bool enY = (pos.y < 12.0f);
+
+                // Cronometro
+                if (enX && enZ && enY) {
+                    tiempoEnAgua += gameTime.deltaTime / 1000.0f;
+
+                    // Imprime el tiempo 
+                    std::cout << "Tiempo en Radiacion: " << tiempoEnAgua << std::endl;
+
+                    if (tiempoEnAgua >= 15.0f) { // Tiempo limite
+
+                        // HACER DAÑO
+                        jugador->recibirDano(get_nanos() / 1000000.0);
+
+                        // Reiniciar cuenta
+                        tiempoEnAgua = 0.0f;
+                    }
+                }
+                else {
+                    tiempoEnAgua = 0.0f;
+                }
+            }
+
 			// Actualizamos la camara
             camara->cameraDetails->CamaraUpdate(camara->getRotY(), camara->getTranslate());
 
