@@ -229,8 +229,12 @@ class Scene {
             if (Principal* jugador = dynamic_cast<Principal*>(getMainModel())) {
                 jugador->reiniciar();
 
-                // [OPCIONAL] Resetear posicion inicial (ej. 5, 10, -5)
-                glm::vec3 respawn = glm::vec3(5.0f, 10.0f, -5.0f);
+
+                const float SPAWN_X = 50.0f;
+                const float SPAWN_Z = -230.0f;
+                float yRespawn = getTerreno()->Superficie(SPAWN_X, SPAWN_Z);
+                glm::vec3 respawn = glm::vec3(SPAWN_X, yRespawn, SPAWN_Z);
+
                 jugador->setTranslate(&respawn);
                 jugador->setNextTranslate(&respawn);
             }
@@ -245,9 +249,9 @@ class Scene {
                     total++;
                 }
                 if (Villano* v = dynamic_cast<Villano*>(m)) {
-                    // Posicion inicial del villano (Coordenadas del Dia 1)
-                    float terrenoY = getTerreno()->Superficie(20.0f, 30.0f);
-                    glm::vec3 inicioVillano = glm::vec3(20.0f, terrenoY, 30.0f);
+                    // Posicion inicial del villano
+                    float terrenoY = getTerreno()->Superficie(65.0f, 340.0f);
+                    glm::vec3 inicioVillano = glm::vec3(65.0f, terrenoY, 340.0f);
                     v->setTranslate(&inicioVillano);
                     v->setNextTranslate(&inicioVillano);
                     v->setAnimation(0); // Idle

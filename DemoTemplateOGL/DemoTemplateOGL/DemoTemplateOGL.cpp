@@ -123,6 +123,11 @@ int startGameEngine(void *ptrMsg){
     // Main character with it's camera
     glm::vec3 translate, scale, v(0, 0, -1);
     translate = glm::vec3(5.0f, 10.0f, -5.0f);
+
+    // Coordenadas de spawn
+    const float SPAWN_X = 50.0f;
+    const float SPAWN_Z = -230.0f;
+
     //5, ye - 1,-5
     //MainModel *model = new MainModel(hWnd, "models/Cube.obj", translate);
     //MainModel *model = new MainModel(hWnd, "models/Cube.obj", translate);
@@ -162,7 +167,9 @@ int startGameEngine(void *ptrMsg){
     }
 
     OGLobj = new Scenario(model); // Creamos nuestra escena con esa posicion de inicio
-    translate = glm::vec3(5.0f, OGLobj->getTerreno()->Superficie(5.0, -5.0), -5.0f);
+
+    float ySpawn = OGLobj->getTerreno()->Superficie(SPAWN_X, SPAWN_Z);
+    translate = glm::vec3(SPAWN_X, ySpawn, SPAWN_Z);
     model->setTranslate(&translate);
     model->setNextTranslate(&translate);
     renderiza = false;

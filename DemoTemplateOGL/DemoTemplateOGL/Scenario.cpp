@@ -50,7 +50,7 @@ void Scenario::InitGraph(Model *main) {
 
     Villano* villano = new Villano("models/Villano/Villano_Base.fbx", main->cameraDetails);
 
-    translate = glm::vec3(20.0f, terreno->Superficie(20.0f, 30.0f), 30.0f);
+    translate = glm::vec3(20.0f, terreno->Superficie(65.0f, 340.0f), 340.0f);
     scale = glm::vec3(0.02f, 0.02f, 0.02f); // Ajusta la escala, los FBX de Mixamo a veces son enormes o diminutos
     villano->name = "Villano";
     villano->setTranslate(&translate);
@@ -156,7 +156,7 @@ void Scenario::InitGraph(Model *main) {
 
     // ------------------ FABRICA -----------------------
 
-    glm::vec3 posEdificio = glm::vec3(50.0f, terreno->Superficie(50.0f, 600.0f), 600.0f);
+    glm::vec3 posEdificio = glm::vec3(50.0f, terreno->Superficie(50.0f, 300.0f), 300.0f);
 
     Model* fabrica = new Model("models/Estructuras/Warehouse_Final.glb", main->cameraDetails);
     fabrica->name = "FabricaVisual";
@@ -173,16 +173,16 @@ void Scenario::InitGraph(Model *main) {
 
     ModelAttributes& attrFabrica = fabrica->getModelAttributes()->at(0);
     if (attrFabrica.hitbox != NULL) {
-        delete (Model*)attrFabrica.hitbox; // Liberamos la memoria de la caja
-        attrFabrica.hitbox = NULL;         // La ponemos en NULL para que el jugador la ignore
+        delete (Model*)attrFabrica.hitbox;
+        attrFabrica.hitbox = NULL;  
     }
 
     ourModel.emplace_back(fabrica);
 
-    // 2. PARED IZQUIERDA (Mirando desde la entrada)
+    // 2. PARED IZQUIERDA
     CollitionBox* paredIzq = new CollitionBox(
-        posEdificio.x - 45.0f, posEdificio.y + 20.0f, posEdificio.z - 10, // Movida a la izquierda
-        2.0f, 20.0f, 80.0f, // Delgada en X, Alta en Y, Larga en Z
+        posEdificio.x - 45.0f, posEdificio.y + 20.0f, posEdificio.z - 27, // Movida a la izquierda
+        2.0f, 30.0f, 60.0f, // Delgada en X, Alta en Y, Larga en Z
         main->cameraDetails
     );
     ourModel.emplace_back(paredIzq);
@@ -190,39 +190,46 @@ void Scenario::InitGraph(Model *main) {
     // 3. PARED DERECHA
     CollitionBox* paredDer = new CollitionBox(
         posEdificio.x + 45.0f, posEdificio.y + 20.0f, posEdificio.z + 8, // Movida a la derecha
-        2.0f, 20.0f, 100.0f,
+        2.0f, 30.0f, 100.0f,
         main->cameraDetails
     );
     ourModel.emplace_back(paredDer);
 
-    // 4. PARED TRASERA(AHORA ES SOLIDA EN EL LADO "POSITIVO")
+    // 4. PARED TRASERA
         CollitionBox * paredFondo = new CollitionBox(
-            posEdificio.x, posEdificio.y + 20.0f, posEdificio.z + 100.0f, // CAMBIO: +100 en vez de -100
-            70.0f, 20.0f, 2.0f,
+            posEdificio.x - 40, posEdificio.y + 20.0f, posEdificio.z + 106.0f,
+            90.0f, 30.0f, 2.0f,
             main->cameraDetails
         );
     ourModel.emplace_back(paredFondo);
 
-    // 5. PARED FRENTE IZQUIERDA (AHORA CON HUECO EN EL LADO "NEGATIVO")
+    // 5. PARED FRENTE IZQUIERDA 
     CollitionBox* paredFrente1 = new CollitionBox(
-        posEdificio.x - 23.0f, posEdificio.y + 20.0f, posEdificio.z - 90.0f, // CAMBIO: -100 en vez de +100
-        25.0f, 20.0f, 2.0f,
+        posEdificio.x - 23.0f, posEdificio.y + 20.0f, posEdificio.z - 90.0f,
+        25.0f, 30.0f, 2.0f,
         main->cameraDetails
     );
     ourModel.emplace_back(paredFrente1);
 
     // 6. PARED FRENTE DERECHA
     CollitionBox* paredFrente2 = new CollitionBox(
-        posEdificio.x + 40.0f, posEdificio.y + 20.0f, posEdificio.z - 90.0f, // CAMBIO: -100 en vez de +100
-        3.0f, 20.0f, 2.0f,
+        posEdificio.x + 40.0f, posEdificio.y + 20.0f, posEdificio.z - 90.0f,
+        3.0f, 30.0f, 2.0f,
         main->cameraDetails
     );
     ourModel.emplace_back(paredFrente2);
 
+    CollitionBox* paredIzquierdaFondo = new CollitionBox(
+        posEdificio.x - 130.0f, posEdificio.y + 20.0f, posEdificio.z + 70.0f,
+        2.0f, 30.0f, 40.0f,
+        main->cameraDetails
+    );
+    ourModel.emplace_back(paredIzquierdaFondo);
+
     // ------------------ VEHICULOS -----------------------
 
     model = new Model("models/Objetos/CAR1.glb", main->cameraDetails);
-    translate = glm::vec3(200.0f, terreno->Superficie(200.0f, 30.0f), 150.0f);
+    translate = glm::vec3(200.0f, terreno->Superficie(200.0f, 30.0f) + 1.0f, 150.0f);
     scale = glm::vec3(0.15f, 0.15f, 0.15f);	// it's a bit too big for our scene, so scale it down
     model->name = "car1";
     model->setTranslate(&translate);
@@ -232,7 +239,7 @@ void Scenario::InitGraph(Model *main) {
     ourModel.emplace_back(model);
 
     model = new Model("models/Objetos/CAR2.glb", main->cameraDetails);
-    translate = glm::vec3(150.0f, terreno->Superficie(150.0f, 30.0f), 150.0f);
+    translate = glm::vec3(150.0f, terreno->Superficie(150.0f, 30.0f) + 1.0f, 150.0f);
     scale = glm::vec3(0.025f, 0.025f, 0.025f);	// it's a bit too big for our scene, so scale it down
     model->name = "car2";
     model->setTranslate(&translate);
@@ -243,7 +250,7 @@ void Scenario::InitGraph(Model *main) {
     ourModel.emplace_back(model);
 
     model = new Model("models/Objetos/CAR3.glb", main->cameraDetails);
-    translate = glm::vec3(100.0f, terreno->Superficie(100.0f, 30.0f), 150.0f);
+    translate = glm::vec3(100.0f, terreno->Superficie(100.0f, 30.0f) + 1.0f, 150.0f);
     scale = glm::vec3(0.06f, 0.06f, 0.06f);	// it's a bit too big for our scene, so scale it down
     model->name = "car3";
     model->setTranslate(&translate);
@@ -256,7 +263,7 @@ void Scenario::InitGraph(Model *main) {
     // -------------------------------------------------------
 
     model = new Model("models/Objetos/BARREL.glb", main->cameraDetails);
-    translate = glm::vec3(70.0f, terreno->Superficie(70.0f, 30.0f) + 2.0f, 150.0f);
+    translate = glm::vec3(41.0f, terreno->Superficie(41.0f, 30.0f) + 3.0f, 88.0f);
     scale = glm::vec3(0.6f, 0.6f, 0.6f);	// it's a bit too big for our scene, so scale it down
     model->name = "Barril";
     model->setTranslate(&translate);
@@ -278,7 +285,7 @@ void Scenario::InitGraph(Model *main) {
     ourModel.emplace_back(model);
 
     model = new Model("models/Objetos/SENAL.glb", main->cameraDetails);
-    translate = glm::vec3(30.0f, terreno->Superficie(30.0f, 30.0f) + 0.0f, 150.0f);
+    translate = glm::vec3(30.0f, terreno->Superficie(45.0f, -160.0f) + 0.0f, -160.0f);
     scale = glm::vec3(3.0f, 3.0f, 3.0f);	// it's a bit too big for our scene, so scale it down
     model->name = "Libreta";
     model->setTranslate(&translate);
@@ -300,7 +307,7 @@ void Scenario::InitGraph(Model *main) {
     ourModel.emplace_back(model);
 
     model = new Recolectable("models/Objetos/MEDIDOR2.glb", main->cameraDetails);
-    translate = glm::vec3(-10.0f, terreno->Superficie(-10.0f, 30.0f) + 2.0f, 150.0f);
+    translate = glm::vec3(67.0f, terreno->Superficie(67.0f, 30.0f) + 2.0f, 270.0f);
     scale = glm::vec3(0.01f, 0.01f, 0.01f);	// it's a bit too big for our scene, so scale it down
     model->name = "Medidor";
     model->setTranslate(&translate);
@@ -311,7 +318,7 @@ void Scenario::InitGraph(Model *main) {
     ourModel.emplace_back(model);
 
     model = new Recolectable("models/Objetos/STONES.glb", main->cameraDetails);
-    translate = glm::vec3(-30.0f, terreno->Superficie(-30.0f, 30.0f) + 2.0f, 150.0f);
+    translate = glm::vec3(52.0f, terreno->Superficie(52.0f, 30.0f) + 2.0f, -150.0f);
     scale = glm::vec3(4.f, 4.f, 4.f);	// it's a bit too big for our scene, so scale it down
     model->name = "Stones";
     model->setTranslate(&translate);
@@ -322,14 +329,14 @@ void Scenario::InitGraph(Model *main) {
     ourModel.emplace_back(model);
 
     model = new Recolectable("models/Objetos/RECORDER.glb", main->cameraDetails);
-    translate = glm::vec3(-50.0f, terreno->Superficie(-50.0f, 30.0f) + 2.0f, 150.0f);
+    translate = glm::vec3(-22.0f, terreno->Superficie(-22.0f, 30.0f) + 2.0f, 360.0f);
     scale = glm::vec3(0.1f, 0.1f, 0.1f);	// it's a bit too big for our scene, so scale it down
     model->name = "Stones";
     model->setTranslate(&translate);
     model->setNextTranslate(&translate);
     model->setScale(&scale);
-    model->setNextRotX(-90);
-    model->setNextRotZ(90);
+    /*model->setNextRotX(-90);
+    model->setNextRotZ(90);*/
     ourModel.emplace_back(model);
 
     // ------------------ BOSQUE ALEATORIO -----------------------
